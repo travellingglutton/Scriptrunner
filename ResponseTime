@@ -1,0 +1,30 @@
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.issue.history.ChangeItemBean 
+import groovy.time.*
+
+def changeHistoryManager = ComponentAccessor.getChangeHistoryManager()
+
+log.warn("issue: " + issue)
+log.warn("issue.getCreated(): " + issue.getCreated())
+
+def assigneeChangeItems = changeHistoryManager.getChangeItemsForField(issue, "assignee")
+log.warn("assigneeChangeItems: " + assigneeChangeItems)
+
+def firstAssigneeCreatedDate = null
+def issueCreatedTime = issue.getCreated()
+
+if((assigneeChangeItems !=null) && (!assigneeChangeItems.isEmpty())) {
+    def firstAssignee = assigneeChangeItems.get(0)
+//    log.warn("firstAssignee: " + firstAssignee)
+    firstAssigneeCreatedDate = firstAssignee.getCreated()
+    log.warn("firstAssigneeCreatedDate: " + firstAssigneeCreatedDate)
+    //return firstAssigneeCreatedDate
+}
+
+if((issue.getCreated()) && (firstAssigneeCreatedDate)){
+    def duration = TimeCategory.minus(firstAssigneeCreatedDate, issueCreatedTime)
+    log.warn("duration: " + duration)
+    return duration
+}else{
+    return null
+}
